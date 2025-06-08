@@ -1,57 +1,185 @@
-local function x()
-    local s = setmetatable({}, {
-        __index = function(_, k)
-            return game:GetService(k)
-        end
-    })
+--// Services
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local player = Players.LocalPlayer
+local mouse = player:GetMouse()
 
-    local g = getgenv and getgenv() or {}
-    g._boot = {
-        version = "3.0.0-public",
-        key = "not_set",
-        devMode = false,
-        unlockAll = true,
-        infCurrency = true,
-        godMode = true,
-        user = game.Players.LocalPlayer.Name
-    }
+--// Key System
+local KEY = "Fenton"
 
-    local function n(txt)
-        pcall(function()
-            s["StarterGui"]:SetCore("SendNotification", {
-                Title = "Game Unlocker",
-                Text = txt,
-                Duration = 2.5,
-                Icon = "rbxassetid://7733960981"
-            })
+--// RemoteEvent for unlocking characters
+local unlockEvent = ReplicatedStorage:WaitForChild("metaRemoteEvent")
+
+--// Character names list (cleaned & deduped from your scan)
+local charactersToUnlock = {
+    "Azula", "FateClone", "SandClone", "HumanTorch", "SkeletonSypha2", "LokiClone", "Goblin",
+    "DEMON", "MomWandaX", "MantisX", "NPCRaven", "SabrinaRaven", "DemonGoat", "JohnnyFireRaven",
+    "SylvieClone", "Syp", "Victim", "RigAbsorb", "StrangeClone", "AgathaHarkness", "AgathaLight",
+    "Ajak", "ArcherSkeleton", "AtomEve", "Bella", "BlackPanther", "BlackWidow", "Bloom",
+    "BlueMarvel", "Bonnie", "BumbleBee", "ChildKlarion", "DanSpooky", "DarkBloom", "DarkJosie",
+    "DarkPhoenix", "DrFate", "DragonFairy", "Eleven", "EmmaFrost", "FirePrincess", "GwenBen10",
+    "HarryWizard", "Hera", "IronMan", "Katara", "Loki", "Magik", "Magneto", "Mantis", "Mera",
+    "MomWanda", "PercyJackson", "Polaris", "Powergirl", "Psylocke", "Raven", "ScarletWitch",
+    "Shiklah", "Spidergwen", "Spiderman", "StarSapphire", "Storm", "Supergirl", "Superman", "Thor",
+    "Ultron", "Venom", "WandaVision", "WaterFairy", "Wednesday", "WhiteRaven", "Zatanna"
+}
+
+--// Variables for invincibility and coins
+local invincibilityConnection
+local coinsStatName = "Coins"
+local coinsValue
+local infiniteCoinsRunning = false
+
+--// Functions
+local function setInvincibility(on)
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    if not humanoid then return end
+
+    if on then
+        if invincibilityConnection then return end
+        invincibilityConnection = humanoid.HealthChanged:Connect(function()
+            if humanoid.Health < humanoid.MaxHealth then
+                humanoid.Health = humanoid.MaxHealth
+            end
         end)
+    else
+        if invincibilityConnection then
+            invincibilityConnection:Disconnect()
+            invincibilityConnection = nil
+        end
     end
-
-    local function fakeAPIRequest()
-        local http = s["HttpService"]
-        local body = {
-            user = g._boot.user,
-            mode = g._boot.devMode,
-            action = "INIT_UNLOCK",
-            verify = true
-        }
-        local encoded = http:JSONEncode(body)
-        return http:JSONDecode(encoded)
-    end
-
-    n("Fetching character list...")
-    task.wait(1.8)
-    n("Injecting coin handler...")
-    task.wait(1.5)
-    n("Activating invincibility core...")
-    task.wait(1.7)
-
-    fakeAPIRequest()
-    task.wait(2)
-
-    n("Error: Game version mismatch")
-    task.wait(1.2)
-    s["Players"].LocalPlayer:Kick("Game is not supported. Please contact xxvergo if this is a bug.")
 end
 
-pcall(x)
+local function setInfiniteCoins(on)
+    local leaderstats = player:FindFirstChild("leaderstats")
+    if not leaderstats then return end
+
+    coinsValue = leaderstats:FindFirstChild(coinsStatName)
+    if not coinsValue then return end
+
+    if on and not infiniteCoinsRunning then
+        infiniteCoinsRunning = true
+        spawn(function()
+            while infiniteCoinsRunning and coinsValue and coinsValue.Parent do
+                coinsValue.Value = 999999999
+                wait(1)
+            end
+        end)
+    elseif not on then
+        infiniteCoinsRunning = false
+    end
+end
+
+local function unlockAllCharacters()
+    if not unlockEvent then
+        warn("Unlock event not found!")
+        return
+    end
+    for _, charName in ipairs(charactersToUnlock) do
+        unlockEvent:FireServer(charName)
+        wait(0.3)
+    end
+    print("All specified characters unlocked!")
+end
+
+--// Create UI
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "HeroModGUI"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = player:WaitForChild("PlayerGui")
+
+--// Key Input Frame
+local KeyFrame = Instance.new("Frame")
+KeyFrame.Size = UDim2.new(0, 300, 0, 150)
+KeyFrame.Position = UDim2.new(0.5, -150, 0.4, -75)
+KeyFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+KeyFrame.BorderSizePixel = 0
+KeyFrame.Parent = ScreenGui
+
+local KeyLabel = Instance.new("TextLabel")
+KeyLabel.Size = UDim2.new(1, 0, 0, 50)
+KeyLabel.BackgroundTransparency = 1
+KeyLabel.Text = "Enter Key:"
+KeyLabel.TextColor3 = Color3.new(1,1,1)
+KeyLabel.Font = Enum.Font.SourceSansBold
+KeyLabel.TextSize = 24
+KeyLabel.Parent = KeyFrame
+
+local KeyBox = Instance.new("TextBox")
+KeyBox.Size = UDim2.new(1, -40, 0, 40)
+KeyBox.Position = UDim2.new(0, 20, 0, 60)
+KeyBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+KeyBox.TextColor3 = Color3.new(1,1,1)
+KeyBox.Font = Enum.Font.SourceSans
+KeyBox.TextSize = 22
+KeyBox.ClearTextOnFocus = false
+KeyBox.PlaceholderText = "Type key here..."
+KeyBox.Parent = KeyFrame
+
+local SubmitButton = Instance.new("TextButton")
+SubmitButton.Size = UDim2.new(0, 100, 0, 40)
+SubmitButton.Position = UDim2.new(1, -110, 1, -50)
+SubmitButton.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+SubmitButton.Text = "Submit"
+SubmitButton.TextColor3 = Color3.new(1,1,1)
+SubmitButton.Font = Enum.Font.SourceSansBold
+SubmitButton.TextSize = 20
+SubmitButton.Parent = KeyFrame
+
+--// Main GUI Frame (hidden initially)
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 280, 0, 220)
+MainFrame.Position = UDim2.new(0.5, -140, 0.4, -110)
+MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+MainFrame.BorderSizePixel = 0
+MainFrame.Visible = false
+MainFrame.Parent = ScreenGui
+
+local TitleLabel = Instance.new("TextLabel")
+TitleLabel.Size = UDim2.new(1, 0, 0, 40)
+TitleLabel.BackgroundTransparency = 1
+TitleLabel.Text = "Heroes: Online World Mod Menu"
+TitleLabel.TextColor3 = Color3.new(1,1,1)
+TitleLabel.Font = Enum.Font.SourceSansBold
+TitleLabel.TextSize = 20
+TitleLabel.Parent = MainFrame
+
+-- Buttons
+local function createButton(text, posY)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, -20, 0, 40)
+    btn.Position = UDim2.new(0, 10, 0, posY)
+    btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    btn.TextColor3 = Color3.new(1,1,1)
+    btn.Font = Enum.Font.SourceSansBold
+    btn.TextSize = 18
+    btn.Text = text
+    btn.Parent = MainFrame
+    return btn
+end
+
+local InvincibleBtn = createButton("Toggle Invincibility", 50)
+local CoinsBtn = createButton("Toggle Infinite Coins", 100)
+local UnlockBtn = createButton("Unlock All Characters", 150)
+
+-- Minimize & Close Buttons
+local MinimizeBtn = Instance.new("TextButton")
+MinimizeBtn.Size = UDim2.new(0, 50, 0, 30)
+MinimizeBtn.Position = UDim2.new(1, -60, 0, 5)
+MinimizeBtn.BackgroundColor3 = Color3.fromRGB(90, 90, 90)
+MinimizeBtn.Text = "_"
+MinimizeBtn.TextColor3 = Color3.new(1,1,1)
+MinimizeBtn.Font = Enum.Font.SourceSansBold
+MinimizeBtn.TextSize = 25
+MinimizeBtn.Parent = MainFrame
+
+local CloseBtn = Instance.new("TextButton")
+CloseBtn.Size = UDim2.new(0, 50, 0, 30)
+CloseBtn.Position = UDim2.new(1, -110, 0, 5)
+CloseBtn.BackgroundColor3 = Color3.fromRGB(90, 90, 90)
+CloseBtn.Text = "X"
+CloseBtn.TextColor3 = Color3.new(1,1,1)
+CloseBtn.Font = Enum.Font.SourceSansBold
+CloseBtn.TextSize = 25
+CloseBtn
