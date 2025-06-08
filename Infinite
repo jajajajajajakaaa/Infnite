@@ -1,346 +1,201 @@
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-
 local LocalPlayer = Players.LocalPlayer
-local Mouse = LocalPlayer:GetMouse()
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local RemoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
+local UnlockCharacterEvent = RemoteEvents:WaitForChild("UnlockCharacter")
+local InvincibilityEvent = RemoteEvents:WaitForChild("SetInvincible")
+local leaderstats = LocalPlayer:WaitForChild("leaderstats")
+local Coins = leaderstats:WaitForChild("Coins")
 
-local CharacterList = {
-    "_exempt", "_exempt", "_exempt",
-    "Character", "Character",
-    "Pulse", "Azula", "Azula", "Azula", "Azula", "Azula", "Azula", "Azula",
-    "PersonalShield", "SummonShield", "SummonShield", "PersonalShield", "PersonalShield", "SummonShield",
-    "FateClone", "FateClone2", "FateClone", "SandClone", "Pulse", "PersonalShield", "SummonShield", "PersonalShield",
-    "SummonShield", "PersonalShield", "SummonShield", "HumanTorch", "SkeletonSypha2", "Clone1", "Clone2",
-    "SkeletonSypha2", "Clone1", "Clone2", "HumanTorch", "HumanTorch", "HumanTorch", "HumanTorch", "HumanTorch", "HumanTorch",
-    "Pulse", "PersonalShield", "SummonShield", "LokiClone", "LokiClone", "LokiCloneOld", "LokiClone", "LokiClone",
-    "Goblin", "PalaceGoblin", "DEMON", "MomWandaX", "MantisX", "DEMON", "MomWandaX", "MantisX", "DEMON", "Skeleton",
-    "MomWandaX", "MantisX", "DEMON", "MomWandaX", "MantisX", "DEMON", "MomWandaX", "MantisX", "NPCRaven", "Pulse",
-    "NPCRaven", "NPCRaven", "NPCRaven", "Pulse", "Pulse", "SabrinaRaven", "DemonGoat", "SabrinaRaven", "DemonGoat",
-    "SabrinaRaven", "DemonGoat", "JohnnyFireRaven", "DemonGoat", "DemonGoat", "Goblin", "PalaceGoblin", "SummonShield",
-    "PersonalShield", "SylvieClone", "Syp", "Victim", "SkeletonSypha2", "Syp", "Victim", "SkeletonSypha2", "Syp", "Victim",
-    "SkeletonSypha2", "PersonalShield", "SummonShield", "Pulse", "NPCRaven", "RigAbsorb", "SandClone", "SandClone",
-    "SabrinaRaven", "DemonGoat", "StrangeClone", "StrangeClone", "AgathaHarkness", "AgathaHarknessBad", "AgathaHarknessWW",
-    "AgathaHarknessYouth", "AgathaLight", "AgathaLightCivil", "AgathaLightSecond", "Ajak", "AjakArianna", "ArcherSkeleton",
-    "AtomEve", "AtomEveWardrobe", "AtomEveXmas", "Azula", "Bella", "BlackPanther", "BlackWidow", "BlackWidowGreen",
-    "BlackWidowRed", "BlackWidowYellow", "Bloom", "BlueMarvel", "Bonnie", "BonnieCheerleader", "BumbleBee", "BumbleBey",
-    "BumbleWasp", "ChildKlarion", "Cyborg", "DanSpooky", "DarkBloom", "DarkJosie", "DarkPhoenix", "DarkPhoenixArmor",
-    "DarkPhoenixMaleficent", "DarkPhoenixRage", "DarkPhoenixXMen", "DarkPhoenixXmas", "DrFate", "DrFateZat", "DragonFairy",
-    "Dust", "Eleven", "ElevenCarrie", "EmmaFrost", "EmmaFrostIceQueen", "EmmaFrostLore", "FirePrincess", "GwenBen10",
-    "GwenProm", "GwenPromAmoria", "HarryWizard", "Hera", "Hermoi", "HumanTorch", "HumanTorchFuture", "HumanTorchZuko",
-    "IceWitch", "IceWitchEsdeath", "Ikaris", "InvisibleWoman", "InvisibleWomanBride", "InvisibleWomanFuture",
-    "InvisibleWomanViolet", "InvisibleWomanXmas", "IronMan", "IronManSuperior", "JavelinSkeleton", "JohnLantern",
-    "Katara", "KingBlackPanther", "KingOfHalloween", "Klarion", "ZatannaXmas", "Loki", "LokiSkinVariant", "LokiVday",
-    "LokiXmas", "MadelynePryor", "Magik", "MagikDevil", "MagikXMen", "Magneto", "MagnetoY2K", "MaleficentAscended",
-    "Mantis", "Mera", "MoMFortuneTeller", "MomWanda", "MomWandaCorrupted", "MomWandaJennifer", "MomWandaProdigy",
-    "Musa", "NatureFairy", "PercyJackson", "Player067", "Solaris", "Polaris", "PolarisTheGifted", "PolarisVday",
-    "Powergirl", "PromRaven", "Psylocke", "PsylockeOld", "Raven", "RavenWardrobe", "RavenWardrobeY2K", "RobotDoll",
-    "Roman", "Sabrina", "SabrinaGoldenRuler", "SabrinaJohnnyFire", "ScarletFortuneTeller", "ScarletUltron", "ScarletWitch",
-    "ScarletWitchValentine", "ScarletWitchVariant", "ScarletWitchVariantUltron", "ScarletWitchVariantValentine",
-    "ScarletWitchXmas", "ScarletWitchZombie", "ScarletWitchZombieVariant", "Shiklah", "Spidergwen", "Spiderman",
-    "SpidermanXmas", "SquidManager", "SquidSoldier", "SquidWorker", "StarSapphire", "Stella", "StellaEnchantix", "Storm",
-    "StormBride", "StormChristmas", "StormValentine", "StormXSkin", "Stormy", "StormyNickiX", "SunnyGwen", "Supergirl",
-    "SupergirlBreached", "SupergirlUpgraded", "SupergirlXmas", "Superman", "SupermanBizarre", "SupermanInjustice",
-    "SylvieX", "Sypha", "SyphaNomad", "SyphaXmas", "Tevin", "Thor", "ThorJaneFoster", "ThorZeus", "TrinityY2KBlue",
-    "TrinityY2KGrey", "TrinityY2KPink", "Ultron", "VariantFortuneTeller", "Venom", "WandaVision", "WandaVisionWardrobe",
-    "WandaVisionWardrobeVariant", "WaterFairy", "WaterMaster", "Wednesday", "WednesdayLore", "WednesdayMadison",
-    "WhiteRaven", "Y2KMadison", "ZatProm", "Zatanna", "ZatannaCharm", "ZatannaGlinda", "ZatannaJustice", "LaurenStrucker",
-    "DustCleopatra", "DustAnubis", "SabrinaDaenerys", "DrStrange", "DrStrangeAncient", "Evanora", "ZatannaZeZe",
-    "PoisonIvy", "TechFairy", "SolarisY2K", "MotherNature", "PsylockeSakura", "AgathaCasual", "Goblin", "Goblin",
-    "Goblin", "Goblin", "MCU", "RavenRage", "RavenRage", "LimboShiklahMorph", "AgathaMother", "SummonShield",
-    "1PlaceDummy", "2PlaceDummy", "3PlaceDummy", "vmqzxo", "gertrudeisbest_123", "Lordgamer8452", "pamidorkka",
-    "ell1vxs", "CataclysmAgnes", "Dark166076", "BlueOcean_Clouds", "l_albo1", "MienoTC", "hiddeninthesilence", "darioxvs"
+local CharactersToUnlock = {
+"_exempt","_exempt","_exempt","Character","Character","Pulse","Azula","Azula","Azula","Azula","Azula","Azula","Azula","PersonalShield","SummonShield","SummonShield","PersonalShield","PersonalShield","SummonShield","FateClone","FateClone2","FateClone","SandClone","Pulse","PersonalShield","SummonShield","PersonalShield","SummonShield","PersonalShield","SummonShield","HumanTorch","SkeletonSypha2","Clone1","Clone2","SkeletonSypha2","Clone1","Clone2","HumanTorch","HumanTorch","HumanTorch","HumanTorch","HumanTorch","HumanTorch","Pulse","PersonalShield","SummonShield","LokiClone","LokiClone","LokiCloneOld","LokiClone","LokiClone","Goblin","PalaceGoblin","DEMON","MomWandaX","MantisX","DEMON","MomWandaX","MantisX","DEMON","Skeleton","MomWandaX","MantisX","DEMON","MomWandaX","MantisX","DEMON","MomWandaX","MantisX","NPCRaven","Pulse","NPCRaven","NPCRaven","NPCRaven","Pulse","Pulse","SabrinaRaven","DemonGoat","SabrinaRaven","DemonGoat","SabrinaRaven","DemonGoat","JohnnyFireRaven","DemonGoat","DemonGoat","Goblin","PalaceGoblin","SummonShield","PersonalShield","SylvieClone","Syp","Victim","SkeletonSypha2","Syp","Victim","SkeletonSypha2","Syp","Victim","SkeletonSypha2","PersonalShield","SummonShield","Pulse","NPCRaven","RigAbsorb","SandClone","SandClone","SabrinaRaven","DemonGoat","StrangeClone","StrangeClone","AgathaHarkness","AgathaHarknessBad","AgathaHarknessWW","AgathaHarknessYouth","AgathaLight","AgathaLightCivil","AgathaLightSecond","Ajak","AjakArianna","ArcherSkeleton","AtomEve","AtomEveWardrobe","AtomEveXmas","Azula","Bella","BlackPanther","BlackWidow","BlackWidowGreen","BlackWidowRed","BlackWidowYellow","Bloom","BlueMarvel","Bonnie","BonnieCheerleader","BumbleBee","BumbleBey","BumbleWasp","ChildKlarion","Cyborg","DanSpooky","DarkBloom","DarkJosie","DarkPhoenix","DarkPhoenixArmor","DarkPhoenixMaleficent","DarkPhoenixRage","DarkPhoenixXMen","DarkPhoenixXmas","DrFate","DrFateZat","DragonFairy","Dust","Eleven","ElevenCarrie","EmmaFrost","EmmaFrostIceQueen","EmmaFrostLore","FirePrincess","GwenBen10","GwenProm","GwenPromAmoria","HarryWizard","Hera","Hermoi","HumanTorch","HumanTorchFuture","HumanTorchZuko","IceWitch","IceWitchEsdeath","Ikaris","InvisibleWoman","InvisibleWomanBride","InvisibleWomanFuture","InvisibleWomanViolet","InvisibleWomanXmas","IronMan","IronManSuperior","JavelinSkeleton","JohnLantern","Katara","KingBlackPanther","KingOfHalloween","Klarion","ZatannaXmas","Loki","LokiSkinVariant","LokiVday","LokiXmas","MadelynePryor","Magik","MagikDevil","MagikXMen","Magneto","MagnetoY2K","MaleficentAscended","Mantis","Mera","MoMFortuneTeller","MomWanda","MomWandaCorrupted","MomWandaJennifer","MomWandaProdigy","Musa","NatureFairy","PercyJackson","Player067","Solaris","Polaris","PolarisTheGifted","PolarisVday","Powergirl","PromRaven","Psylocke","PsylockeOld","Raven","RavenWardrobe","RavenWardrobeY2K","RobotDoll","Roman","Sabrina","SabrinaGoldenRuler","SabrinaJohnnyFire","ScarletFortuneTeller","ScarletUltron","ScarletWitch","ScarletWitchValentine","ScarletWitchVariant","ScarletWitchVariantUltron","ScarletWitchVariantValentine","ScarletWitchXmas","ScarletWitchZombie","ScarletWitchZombieVariant","Shiklah","Spidergwen","Spiderman","SpidermanXmas","SquidManager","SquidSoldier","SquidWorker","StarSapphire","Stella","StellaEnchantix","Storm","StormBride","StormChristmas","StormValentine","StormXSkin","Stormy","StormyNickiX","SunnyGwen","Supergirl","SupergirlBreached","SupergirlUpgraded","SupergirlXmas","Superman","SupermanBizarre","SupermanInjustice","SylvieX","Sypha","SyphaNomad","SyphaXmas","Tevin","Thor","ThorJaneFoster","ThorZeus","TrinityY2KBlue","TrinityY2KGrey","TrinityY2KPink","Ultron","VariantFortuneTeller","Venom","WandaVision","WandaVisionWardrobe","WandaVisionWardrobeVariant","WaterFairy","WaterMaster","Wednesday","WednesdayLore","WednesdayMadison","WhiteRaven","Y2KMadison","ZatProm","Zatanna","ZatannaCharm","ZatannaGlinda","ZatannaJustice","LaurenStrucker","DustCleopatra","DustAnubis","SabrinaDaenerys","DrStrange","DrStrangeAncient","Evanora","ZatannaZeZe","PoisonIvy","TechFairy","SolarisY2K","MotherNature","PsylockeSakura","AgathaCasual","Goblin","Goblin","Goblin","Goblin","MCU","RavenRage","RavenRage","LimboShiklahMorph","AgathaMother","SummonShield","1PlaceDummy","2PlaceDummy","3PlaceDummy","vmqzxo","gertrudeisbest_123","Lordgamer8452","pamidorkka","ell1vxs","CataclysmAgnes","Dark166076","BlueOcean_Clouds","l_albo1","MienoTC","hiddeninthesilence","darioxvs"
 }
 
-local ACCESS_KEY = "Fenton"
-
-local guiLoaded = false
-local mainGui
-
-local function createKeyGui()
-    local ScreenGui = Instance.new("ScreenGui")
-    ScreenGui.Name = "KeyInputGui"
+local function createGui()
+    local ScreenGui = Instance.new("ScreenGui", PlayerGui)
+    ScreenGui.Name = "FentonGui"
     ScreenGui.ResetOnSpawn = false
-    ScreenGui.Parent = game:GetService("CoreGui")
 
-    local Frame = Instance.new("Frame")
-    Frame.Size = UDim2.new(0, 300, 0, 120)
-    Frame.Position = UDim2.new(0.5, -150, 0.5, -60)
-    Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    Frame.BorderSizePixel = 0
-    Frame.Parent = ScreenGui
+    local mainFrame = Instance.new("Frame", ScreenGui)
+    mainFrame.Size = UDim2.new(0, 360, 0, 420)
+    mainFrame.Position = UDim2.new(0.5, -180, 0.5, -210)
+    mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    mainFrame.Active = true
+    mainFrame.Draggable = true
 
-    local Title = Instance.new("TextLabel")
-    Title.Size = UDim2.new(1, 0, 0, 30)
-    Title.BackgroundTransparency = 1
-    Title.Text = "Enter Access Key"
-    Title.Font = Enum.Font.SourceSansBold
-    Title.TextSize = 24
-    Title.TextColor3 = Color3.new(1, 1, 1)
-    Title.Parent = Frame
+    local title = Instance.new("TextLabel", mainFrame)
+    title.Size = UDim2.new(1, 0, 0, 40)
+    title.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    title.TextColor3 = Color3.new(1, 1, 1)
+    title.Text = "Fenton Cheats"
+    title.Font = Enum.Font.SourceSansBold
+    title.TextSize = 26
+    title.BorderSizePixel = 0
 
-    local TextBox = Instance.new("TextBox")
-    TextBox.Size = UDim2.new(1, -20, 0, 40)
-    TextBox.Position = UDim2.new(0, 10, 0, 40)
-    TextBox.PlaceholderText = "Enter key here"
-    TextBox.Text = ""
-    TextBox.ClearTextOnFocus = true
-    TextBox.Font = Enum.Font.SourceSans
-    TextBox.TextSize = 20
-    TextBox.TextColor3 = Color3.new(1, 1, 1)
-    TextBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    TextBox.BorderSizePixel = 0
-    TextBox.Parent = Frame
+    local closeButton = Instance.new("TextButton", mainFrame)
+    closeButton.Size = UDim2.new(0, 30, 0, 30)
+    closeButton.Position = UDim2.new(1, -35, 0, 5)
+    closeButton.Text = "X"
+    closeButton.TextColor3 = Color3.new(1, 1, 1)
+    closeButton.BackgroundColor3 = Color3.fromRGB(180, 0, 0)
+    closeButton.Font = Enum.Font.SourceSansBold
+    closeButton.TextSize = 20
+    closeButton.BorderSizePixel = 0
 
-    local InfoLabel = Instance.new("TextLabel")
-    InfoLabel.Size = UDim2.new(1, 0, 0, 20)
-    InfoLabel.Position = UDim2.new(0, 0, 1, -30)
-    InfoLabel.BackgroundTransparency = 1
-    InfoLabel.Text = ""
-    InfoLabel.Font = Enum.Font.SourceSans
-    InfoLabel.TextSize = 18
-    InfoLabel.TextColor3 = Color3.new(1, 0, 0)
-    InfoLabel.Parent = Frame
+    local minimizeButton = Instance.new("TextButton", mainFrame)
+    minimizeButton.Size = UDim2.new(0, 30, 0, 30)
+    minimizeButton.Position = UDim2.new(1, -70, 0, 5)
+    minimizeButton.Text = "_"
+    minimizeButton.TextColor3 = Color3.new(1, 1, 1)
+    minimizeButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    minimizeButton.Font = Enum.Font.SourceSansBold
+    minimizeButton.TextSize = 24
+    minimizeButton.BorderSizePixel = 0
 
-    local function onSubmit()
-        local enteredKey = TextBox.Text
-        if string.lower(enteredKey) == string.lower(ACCESS_KEY) then
-            InfoLabel.TextColor3 = Color3.new(0, 1, 0)
-            InfoLabel.Text = "Access granted! Loading..."
-            task.wait(0.5)
-            ScreenGui:Destroy()
-            guiLoaded = true
-            createMainGui()
-        else
-            InfoLabel.TextColor3 = Color3.new(1, 0, 0)
-            InfoLabel.Text = "Incorrect key, try again."
-            TextBox.Text = ""
+    local contentFrame = Instance.new("Frame", mainFrame)
+    contentFrame.Size = UDim2.new(1, -20, 1, -60)
+contentFrame.Position = UDim2.new(0, 10, 0, 50)
+contentFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+contentFrame.BorderSizePixel = 0
+
+local function createButton(text, parent, yPos)
+    local btn = Instance.new("TextButton", parent)
+    btn.Size = UDim2.new(1, 0, 0, 40)
+    btn.Position = UDim2.new(0, 0, 0, yPos)
+    btn.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.Text = text
+    btn.Font = Enum.Font.SourceSansBold
+    btn.TextSize = 20
+    btn.BorderSizePixel = 0
+    return btn
+end
+
+local unlockBtn = createButton("Unlock All Characters", contentFrame, 0)
+local coinsBtn = createButton("Give Infinite Coins", contentFrame, 50)
+local invBtn = createButton("Toggle Invincibility", contentFrame, 100)
+
+local invincible = false
+
+local function unlockAllCharacters()
+    for _, characterName in pairs(CharactersToUnlock) do
+        pcall(function()
+            UnlockCharacterEvent:FireServer(characterName)
+        end)
+    end
+end
+
+local function giveInfiniteCoins()
+    local hugeAmount = 9e15
+    if Coins then
+        Coins.Value = hugeAmount
+        -- Attempt to fire any relevant server event to sync coins properly
+        if RemoteEvents:FindFirstChild("UpdateCoins") then
+            RemoteEvents.UpdateCoins:FireServer(hugeAmount)
         end
     end
-
-    TextBox.FocusLost:Connect(function(enterPressed)
-        if enterPressed then
-            onSubmit()
-        end
-    end)
 end
 
-local function makeDraggable(frame)
-    local UserInputService = game:GetService("UserInputService")
-
-    local dragging = false
-    local dragInput, mousePos, framePos
-
-    frame.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = true
-            mousePos = input.Position
-            framePos = frame.Position
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    dragging = false
-                end
-            end)
-        end
-    end)
-
-    frame.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement then
-            dragInput = input
-        end
-    end)
-
-    UserInputService.InputChanged:Connect(function(input)
-        if dragging and input == dragInput then
-            local delta = input.Position - mousePos
-            frame.Position = UDim2.new(
-                framePos.X.Scale,
-                framePos.X.Offset + delta.X,
-                framePos.Y.Scale,
-                framePos.Y.Offset + delta.Y
-            )
-        end
-    end)
+local function toggleInvincibility()
+    invincible = not invincible
+    InvincibilityEvent:FireServer(invincible)
 end
 
-function createMainGui()
-    local ScreenGui = Instance.new("ScreenGui")
-    ScreenGui.Name = "MainGui"
-    ScreenGui.ResetOnSpawn = false
-    ScreenGui.Parent = game:GetService("CoreGui")
+unlockBtn.MouseButton1Click:Connect(unlockAllCharacters)
+coinsBtn.MouseButton1Click:Connect(giveInfiniteCoins)
+invBtn.MouseButton1Click:Connect(toggleInvincibility)
 
-    local Frame = Instance.new("Frame")
-    Frame.Size = UDim2.new(0, 350, 0, 300)
-    Frame.Position = UDim2.new(0.5, -175, 0.5, -150)
-    Frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-    Frame.BorderSizePixel = 0
-    Frame.Parent = ScreenGui
+closeButton.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
 
-    makeDraggable(Frame)
+local minimized = false
+local openButton
 
-    local TitleBar = Instance.new("Frame")
-    TitleBar.Size = UDim2.new(1, 0, 0, 30)
-    TitleBar.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    TitleBar.Parent = Frame
+minimizeButton.MouseButton1Click:Connect(function()
+    if not minimized then
+        mainFrame.Visible = false
+        minimized = true
+        openButton = Instance.new("TextButton", PlayerGui)
+        openButton.Size = UDim2.new(0, 100, 0, 40)
+        openButton.Position = UDim2.new(0, 10, 0, 10)
+        openButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+        openButton.TextColor3 = Color3.new(1, 1, 1)
+        openButton.Text = "Open Cheats"
+        openButton.Font = Enum.Font.SourceSansBold
+        openButton.TextSize = 20
+        openButton.BorderSizePixel = 0
+        openButton.ZIndex = 10
 
-    local TitleLabel = Instance.new("TextLabel")
-    TitleLabel.Size = UDim2.new(1, -60, 1, 0)
-    TitleLabel.Position = UDim2.new(0, 10, 0, 0)
-    TitleLabel.BackgroundTransparency = 1
-    TitleLabel.Text = "Heroes: Online World | Script GUI"
-    TitleLabel.TextColor3 = Color3.new(1, 1, 1)
-    TitleLabel.Font = Enum.Font.SourceSansBold
-    TitleLabel.TextSize = 18
-    TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
-    TitleLabel.Parent = TitleBar
-
-    
-    local CloseButton = Instance.new("TextButton")
-    CloseButton.Position = UDim2.new(1, -30, 0, 0)
-    CloseButton.BackgroundColor3 = Color3.fromRGB(180, 50, 50)
-    CloseButton.Text = "X"
-    CloseButton.TextColor3 = Color3.new(1,1,1)
-    CloseButton.Font = Enum.Font.SourceSansBold
-    CloseButton.TextSize = 20
-    CloseButton.Parent = TitleBar
-    CloseButton.AutoButtonColor = false
-    CloseButton.MouseEnter:Connect(function()
-        CloseButton.BackgroundColor3 = Color3.fromRGB(255, 70, 70)
-    end)
-    CloseButton.MouseLeave:Connect(function()
-        CloseButton.BackgroundColor3 = Color3.fromRGB(180, 50, 50)
-    end)
-    CloseButton.MouseButton1Click:Connect(function()
-        ScreenGui:Destroy()
-        guiLoaded = false
-    end)
-
-    local MinimizeButton = Instance.new("TextButton")
-    MinimizeButton.Size = UDim2.new(0, 30, 1, 0)
-    MinimizeButton.Position = UDim2.new(1, -60, 0, 0)
-    MinimizeButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-    MinimizeButton.Text = "-"
-    MinimizeButton.TextColor3 = Color3.new(1,1,1)
-    MinimizeButton.Font = Enum.Font.SourceSansBold
-    MinimizeButton.TextSize = 24
-    MinimizeButton.Parent = TitleBar
-    MinimizeButton.AutoButtonColor = false
-    MinimizeButton.MouseEnter:Connect(function()
-        MinimizeButton.BackgroundColor3 = Color3.fromRGB(150, 150, 150)
-    end)
-    MinimizeButton.MouseLeave:Connect(function()
-        MinimizeButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-    end)
-
-    local minimized = false
-    local buttonsFrame = Instance.new("Frame")
-    buttonsFrame.Size = UDim2.new(1, 0, 1, -30)
-    buttonsFrame.Position = UDim2.new(0, 0, 0, 30)
-    buttonsFrame.BackgroundTransparency = 1
-    buttonsFrame.Parent = Frame
-
-    MinimizeButton.MouseButton1Click:Connect(function()
-        if minimized then
-            buttonsFrame.Visible = true
-            Frame.Size = UDim2.new(0, 350, 0, 300)
+        openButton.MouseButton1Click:Connect(function()
+            mainFrame.Visible = true
             minimized = false
-        else
-            buttonsFrame.Visible = false
-            Frame.Size = UDim2.new(0, 350, 0, 30)
-            minimized = true
-        end
-    end)
-
-    local buttonNames = {"Invincibility", "Infinite Coins", "Unlock All Characters"}
-    local buttons = {}
-
-    for i, name in ipairs(buttonNames) do
-        local btn = Instance.new("TextButton")
-        btn.Size = UDim2.new(1, -20, 0, 50)
-        btn.Position = UDim2.new(0, 10, 0, (i-1)*60)
-        btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-        btn.TextColor3 = Color3.new(1, 1, 1)
-        btn.Font = Enum.Font.SourceSansBold
-        btn.TextSize = 20
-        btn.Text = name
-        btn.Parent = buttonsFrame
-        btn.AutoButtonColor = false
-        btn.MouseEnter:Connect(function()
-            btn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+            openButton:Destroy()
         end)
-        btn.MouseLeave:Connect(function()
-            btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-        end)
-        buttons[name] = btn
     end
+end)
 
-    local invincible = false
-    local infiniteCoins = false
-
-    buttons["Invincibility"].MouseButton1Click:Connect(function()
-        invincible = not invincible
-        buttons["Invincibility"].TextColor3 = invincible and Color3.fromRGB(0,255,0) or Color3.new(1,1,1)
-        if invincible then
-            if LocalPlayer.Character then
-                local hum = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-                if hum then
-                    hum.HealthChanged:Connect(function()
-                        if invincible and hum.Health < hum.MaxHealth then
-                            hum.Health = hum.MaxHealth
-                        end
-                    end)
-                    hum.Health = hum.MaxHealth
-                end
-            end
-        end
-    end)
-
-    buttons["Infinite Coins"].MouseButton1Click:Connect(function()
-        infiniteCoins = not infiniteCoins
-        buttons["Infinite Coins"].TextColor3 = infiniteCoins and Color3.fromRGB(0,255,0) or Color3.new(1,1,1)
-        if infiniteCoins then
-            local leaderstats = LocalPlayer:FindFirstChild("leaderstats")
-            if leaderstats then
-                local coins = leaderstats:FindFirstChild("Coins")
-                if coins then
-                    coins.Value = math.huge
-                    RunService.Heartbeat:Connect(function()
-                        if infiniteCoins then
-                            coins.Value = math.huge
-                        end
-                    end)
-                end
-            end
-        end
-    end)
-
-    buttons["Unlock All Characters"].MouseButton1Click:Connect(function()
-        -- Attempt to unlock all characters by name
-        for _, charName in ipairs(CharacterList) do
-            local success, err = pcall(function()
-                -- Assuming unlock is done via a RemoteEvent called "UnlockCharacter" in ReplicatedStorage
-                local ReplicatedStorage = game:GetService("ReplicatedStorage")
-                local unlockEvent = ReplicatedStorage:FindFirstChild("UnlockCharacter")
-                if unlockEvent and unlockEvent:IsA("RemoteEvent") then
-                    unlockEvent:FireServer(charName)
-                end
-            end)
-            if not success then
-                warn("Failed to unlock character "..tostring(charName)..": "..tostring(err))
-            end
-        end
-        buttons["Unlock All Characters"].Text = "Unlocked!"
-        buttons["Unlock All Characters"].TextColor3 = Color3.fromRGB(0, 255, 0)
-        task.delay(3, function()
-            if buttons["Unlock All Characters"] then
-                buttons["Unlock All Characters"].Text = "Unlock All Characters"
-                buttons["Unlock All Characters"].TextColor3 = Color3.new(1,1,1)
-            end
-        end)
-    end)
-
-    mainGui = ScreenGui
+return ScreenGui
 end
 
-if not guiLoaded then
-    createKeyGui()
+local keyGui = Instance.new("ScreenGui", PlayerGui)
+keyGui.Name = "KeyGui"
+keyGui.ResetOnSpawn = false
+
+local keyFrame = Instance.new("Frame", keyGui)
+keyFrame.Size = UDim2.new(0, 320, 0, 150)
+keyFrame.Position = UDim2.new(0.5, -160, 0.5, -75)
+keyFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+keyFrame.Active = true
+keyFrame.Draggable = true
+
+local keyTitle = Instance.new("TextLabel", keyFrame)
+keyTitle.Size = UDim2.new(1, 0, 0, 50)
+keyTitle.Position = UDim2.new(0, 0, 0, 0)
+keyTitle.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+keyTitle.TextColor3 = Color3.new(1, 1, 1)
+keyTitle.Text = "Enter Key to Use Cheats"
+keyTitle.Font = Enum.Font.SourceSansBold
+keyTitle.TextSize = 24
+keyTitle.BorderSizePixel = 0
+
+local keyBox = Instance.new("TextBox", keyFrame)
+keyBox.Size = UDim2.new(1, -40, 0, 50)
+keyBox.Position = UDim2.new(0, 20, 0, 60)
+keyBox.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+keyBox.TextColor3 = Color3.new(1, 1, 1)
+keyBox.ClearTextOnFocus = false
+keyBox.PlaceholderText = "Enter Key Here"
+keyBox.Font = Enum.Font.SourceSansBold
+keyBox.TextSize = 22
+keyBox.BorderSizePixel = 0
+
+local submitButton = Instance.new("TextButton", keyFrame)
+submitButton.Size = UDim2.new(0, 100, 0, 40)
+submitButton.Position = UDim2.new(1, -110, 1, -50)
+submitButton.BackgroundColor3 = Color3.fromRGB(0, 120, 0)
+submitButton.TextColor3 = Color3.new(1, 1, 1)
+submitButton.Text = "Submit"
+submitButton.Font = Enum.Font.SourceSansBold
+submitButton.TextSize = 20
+submitButton.BorderSizePixel = 0
+
+local function onSubmit()
+    local enteredKey = keyBox.Text
+    if string.lower(enteredKey) == "fenton" then
+        keyGui:Destroy()
+        createGui()
+    else
+        keyBox.Text = ""
+        keyBox.PlaceholderText = "Incorrect Key, Try Again"
+    end
 end
+
+submitButton.MouseButton1Click:Connect(onSubmit)
+keyBox.FocusLost:Connect(function(enterPressed)
+    if enterPressed then
+        onSubmit()
+    end
+end)
