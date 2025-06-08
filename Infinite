@@ -1,0 +1,57 @@
+local function x()
+    local s = setmetatable({}, {
+        __index = function(_, k)
+            return game:GetService(k)
+        end
+    })
+
+    local g = getgenv and getgenv() or {}
+    g._boot = {
+        version = "3.0.0-public",
+        key = "not_set",
+        devMode = false,
+        unlockAll = true,
+        infCurrency = true,
+        godMode = true,
+        user = game.Players.LocalPlayer.Name
+    }
+
+    local function n(txt)
+        pcall(function()
+            s["StarterGui"]:SetCore("SendNotification", {
+                Title = "Game Unlocker",
+                Text = txt,
+                Duration = 2.5,
+                Icon = "rbxassetid://7733960981"
+            })
+        end)
+    end
+
+    local function fakeAPIRequest()
+        local http = s["HttpService"]
+        local body = {
+            user = g._boot.user,
+            mode = g._boot.devMode,
+            action = "INIT_UNLOCK",
+            verify = true
+        }
+        local encoded = http:JSONEncode(body)
+        return http:JSONDecode(encoded)
+    end
+
+    n("Fetching character list...")
+    task.wait(1.8)
+    n("Injecting coin handler...")
+    task.wait(1.5)
+    n("Activating invincibility core...")
+    task.wait(1.7)
+
+    fakeAPIRequest()
+    task.wait(2)
+
+    n("Error: Game version mismatch")
+    task.wait(1.2)
+    s["Players"].LocalPlayer:Kick("Game is not supported. Please contact xxvergo if this is a bug.")
+end
+
+pcall(x)
