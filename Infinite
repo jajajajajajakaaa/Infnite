@@ -40,6 +40,9 @@ local function createKeyGui()
     local frame=Instance.new("Frame",ScreenGui)
     frame.Size=UDim2.new(0,300,0,150)
     frame.Position=UDim2.new(0.5,-150,0.5,-75)
+    keyFrame.Active = true
+    keyFrame.Draggable = true
+    keyFrame.Selectable = true
     frame.BackgroundColor3=Color3.fromRGB(30,30,30)
     frame.Active=true
     frame.Draggable=true
@@ -79,6 +82,9 @@ local function createMainGui()
     mainFrame.Name="MainFrame"
     mainFrame.Size=UDim2.new(0,400,0,350)
     mainFrame.Position=UDim2.new(0.5,-200,0.5,-175)
+    mainFrame.Active = true
+    mainFrame.Draggable = true
+    mainFrame.Selectable = true
     mainFrame.BackgroundColor3=Color3.fromRGB(30,30,30)
     mainFrame.Active=true
     makeDraggable(mainFrame)
@@ -209,4 +215,3 @@ local function createMainGui()
     end)
 end
 createKeyGui()
-createMainGui()
