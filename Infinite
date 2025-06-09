@@ -209,3 +209,4 @@ local function createMainGui()
     end)
 end
 createKeyGui()
+createMainGui()
